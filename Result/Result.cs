@@ -50,6 +50,10 @@ public record Result<TValue, TError>
     public TError ErrorValue { get; set; }
 }
 
+/// <summary>
+/// Result represents the result of something that may succeed or not.
+/// 'Ok' means it was successful, 'Error' means it was not successful.
+/// </summary>
 public static class Result
 {
     public static bool IsOk<TValue, TError>(this Result<TValue, TError> result) => result.DidSucceed;

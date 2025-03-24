@@ -53,6 +53,24 @@ public static class Option
         };
     }
 
+    public static Result<TValue, Nil> ToResult<TValue>(this Option<TValue> option)
+    {
+        return option.HasValue switch
+        {
+            true => Result.Ok<TValue, Nil>(option.Value),
+            false => Result.Error<TValue, Nil>(new Nil()),
+        };
+    }
+
+    public static Option<TValue> FromResult<TValue, TError>(this Result<TValue, TError> result)
+    {
+        return result.DidSucceed switch
+        {
+            true => Some(result.Value),
+            false => None<TValue>(),
+        };
+    }
+
     /// <summary>
     /// Extracts the value from an 'Option', returning a default value if there is none.
     /// </summary>
