@@ -3,8 +3,22 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
-        <RootNamespace />
+        <RootNamespace/>
         <LangVersion>latest</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>Result</Title>
+        <Description>Basic result type</Description>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <PackageProjectUrl>https://github.com/nnuuvv/OptionAndResult</PackageProjectUrl>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/nnuuvv/OptionAndResult</RepositoryUrl>
+        <PackageId>nuv.Result</PackageId>
+        <Authors>nuv</Authors>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.md" Pack="true" PackagePath="\">
+        </None>
+    </ItemGroup>
 
 </Project>
