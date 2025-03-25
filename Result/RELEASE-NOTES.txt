@@ -1,0 +1,7 @@
+v.2.0.0
+- Fix Result.Try() implementation
+- Add function summaries
+
+v.1.0.0
+- Initial Release
+ 
