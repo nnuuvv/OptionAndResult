@@ -148,11 +148,11 @@ public static class Result
     /// <typeparam name="TError"></typeparam>
     /// <returns></returns>
     public static Result<TResult, TError> Try<TSource, TResult, TError>(this Result<TSource, TError> result,
-        Func<TSource, TResult> apply)
+        Func<TSource, Result<TResult, TError>> apply)
     {
         return result.IsOk() switch
         {
-            true => Ok<TResult, TError>(apply(result.Value)),
+            true => apply(result.Value),
             _ => Error<TResult, TError>(result.ErrorValue)
         };
     }
@@ -248,8 +248,8 @@ public static class Result
 
         foreach (var result in results)
         {
-            if(result.IsOk()) values.Add(result.Value);
-            if(result.IsError()) errors.Add(result.ErrorValue);
+            if (result.IsOk()) values.Add(result.Value);
+            if (result.IsError()) errors.Add(result.ErrorValue);
         }
 
         return (values, errors);
