@@ -6,6 +6,7 @@
         <LangVersion>latest</LangVersion>
         <RootNamespace/>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Title>Option</Title>
         <Description>Basic option type</Description>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
@@ -14,17 +15,28 @@
         <RepositoryUrl>https://github.com/nnuuvv/OptionAndResult</RepositoryUrl>
         <PackageId>nuv.Option</PackageId>
         <Authors>nuv</Authors>
+        <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="readme.md">
-        <Pack>true</Pack>
-        <PackagePath>\</PackagePath>
-      </None>
+        <None Update="readme.md">
+            <Pack>true</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="nuv.Result" Version="1.0.0" />
+        <PackageReference Include="nuv.Result" Version="1.0.0"/>
     </ItemGroup>
 
+
+    <Target Name="PreparePackageReleaseNotesFromFile" BeforeTargets="GenerateNuspec">
+        <ReadLinesFromFile File="./RELEASE-NOTES.txt">
+            <Output TaskParameter="Lines" ItemName="ReleaseNoteLines"/>
+        </ReadLinesFromFile>
+
+        <PropertyGroup>
+            <PackageReleaseNotes>@(ReleaseNoteLines, '%0a')</PackageReleaseNotes>
+        </PropertyGroup>
+    </Target>
 </Project>
