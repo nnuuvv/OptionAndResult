@@ -56,9 +56,31 @@ public record Result<TValue, TError>
 /// </summary>
 public static class Result
 {
+    /// <summary>
+    /// Checks whether the given result represents a successful operation.
+    /// </summary>
+    /// <param name="result">The result instance to check.</param>
+    /// <typeparam name="TValue">The type of the value associated with a successful result.</typeparam>
+    /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
+    /// <returns>True if the result represents a successful operation; otherwise, false.</returns>
     public static bool IsOk<TValue, TError>(this Result<TValue, TError> result) => result.DidSucceed;
+
+    /// <summary>
+    /// Determines whether the given result represents an unsuccessful operation.
+    /// </summary>
+    /// <param name="result">The result instance to evaluate.</param>
+    /// <typeparam name="TValue">The type of the value associated with a successful result.</typeparam>
+    /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
+    /// <returns>True if the result represents an unsuccessful operation; otherwise, false.</returns>
     public static bool IsError<TValue, TError>(this Result<TValue, TError> result) => !result.DidSucceed;
 
+    /// <summary>
+    /// Creates a successful result with the specified value.
+    /// </summary>
+    /// <param name="value">The value associated with a successful result.</param>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <returns>A new result instance representing a successful operation with the specified value.</returns>
     public static Result<TValue, TError> Ok<TValue, TError>(TValue value)
     {
         return new Result<TValue, TError>()
@@ -68,6 +90,13 @@ public static class Result
         };
     }
 
+    /// <summary>
+    /// Creates a new result instance representing an error.
+    /// </summary>
+    /// <param name="error">The error value associated with the unsuccessful result.</param>
+    /// <typeparam name="TValue">The type of the value associated with a successful result.</typeparam>
+    /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
+    /// <returns>A result instance encapsulating the provided error value.</returns>
     public static Result<TValue, TError> Error<TValue, TError>(TError error)
     {
         return new Result<TValue, TError>()
@@ -241,7 +270,7 @@ public static class Result
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TError"></typeparam>
     /// <returns></returns>
-    public static (List<TValue>, List<TError>) Partition<TValue, TError>(this List<Result<TValue, TError>> results)
+    public static Tuple<List<TValue>, List<TError>> Partition<TValue, TError>(this List<Result<TValue, TError>> results)
     {
         var values = new List<TValue>();
         var errors = new List<TError>();
@@ -252,11 +281,18 @@ public static class Result
             if (result.IsError()) errors.Add(result.ErrorValue);
         }
 
-        return (values, errors);
+        return Tuple.Create(values, errors);
     }
 
 
-    public static List<T> Values<T, TError>(this List<Result<T, TError>> list)
+    /// <summary>
+    /// Extracts the values from all successful results in the given list.
+    /// </summary>
+    /// <typeparam name="TValue">The type of value associated with a successful result.</typeparam>
+    /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
+    /// <param name="list">The list of Result objects to evaluate.</param>
+    /// <returns>A list containing the values from all successful results.</returns>
+    public static List<TValue> Values<TValue, TError>(this List<Result<TValue, TError>> list)
     {
         return list
             .Where(x => x.DidSucceed)

@@ -1,3 +1,6 @@
+v.2.0.1
+- Add support for NETStandard 2.0
+
 v.2.0.0
 - Fix Result.Try() implementation
 - Add function summaries

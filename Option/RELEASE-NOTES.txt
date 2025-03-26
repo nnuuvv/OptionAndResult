@@ -1,3 +1,6 @@
+v.1.0.2
+- Add support for NETStandard 2.0
+
 v.1.0.1
 - Add function summaries
 

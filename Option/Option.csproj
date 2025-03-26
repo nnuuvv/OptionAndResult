@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
         <RootNamespace/>
@@ -15,18 +14,16 @@
         <RepositoryUrl>https://github.com/nnuuvv/OptionAndResult</RepositoryUrl>
         <PackageId>nuv.Option</PackageId>
         <Authors>nuv</Authors>
-        <Version>1.0.1</Version>
+        <Version>1.0.2</Version>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="readme.md">
-            <Pack>true</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
+        <None Include="readme.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="nuv.Result" Version="1.0.0"/>
+        <PackageReference Include="nuv.Result" Version="2.0.1"/>
     </ItemGroup>
 
 

@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Represents a container that may or may not hold a value of type <typeparamref name="T"/>.
+/// Should be used for Optional parameters. For return values use <see cref="Result"/>
+/// </summary>
+/// <typeparam name="T">The type of value the Option can hold.</typeparam>
 public record Option<T>
 {
     /// <summary>
@@ -31,11 +36,34 @@ public record Option<T>
     public bool HasValue { get; set; }
 }
 
+/// <summary>
+/// Provides a set of operations to create, transform, and work with instances of <see cref="Option{T}"/>.
+/// Represents utility methods for handling optional values.
+/// </summary>
 public static class Option
 {
+    /// <summary>
+    /// Determines whether the specified <see cref="Option{T}"/> contains a value.
+    /// </summary>
+    /// <param name="option">The <see cref="Option{T}"/> to inspect.</param>
+    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
+    /// <returns>True if the <see cref="Option{T}"/> contains a value; otherwise, false.</returns>
     public static bool IsSome<T>(this Option<T> option) => option.HasValue;
+
+    /// <summary>
+    /// Determines whether the specified <see cref="Option{T}"/> does not contain a value.
+    /// </summary>
+    /// <param name="option">The <see cref="Option{T}"/> to inspect.</param>
+    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
+    /// <returns>True if the <see cref="Option{T}"/> does not contain a value; otherwise, false.</returns>
     public static bool IsNone<T>(this Option<T> option) => !option.HasValue;
 
+    /// <summary>
+    /// Creates an instance of <see cref="Option{T}"/> that holds a value.
+    /// </summary>
+    /// <param name="value">The value to be wrapped in an <see cref="Option{T}"/>.</param>
+    /// <typeparam name="T">The type of the value to wrap.</typeparam>
+    /// <returns>An <see cref="Option{T}"/> containing the specified value.</returns>
     public static Option<T> Some<T>(T value)
     {
         return new Option<T>()
@@ -45,6 +73,11 @@ public static class Option
         };
     }
 
+    /// <summary>
+    /// Creates an instance of <see cref="Option{T}"/> that does not contain a value.
+    /// </summary>
+    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
+    /// <returns>An <see cref="Option{T}"/> with no value.</returns>
     public static Option<T> None<T>()
     {
         return new Option<T>()
@@ -53,6 +86,16 @@ public static class Option
         };
     }
 
+    /// <summary>
+    /// Converts the specified <see cref="Option{T}"/> to a <see cref="Result{TValue, TError}"/>.
+    /// If the <see cref="Option{T}"/> contains a value, a successful <see cref="Result{TValue, TError}"/> is returned.
+    /// Otherwise, an error <see cref="Result{TValue, TError}"/> containing a <see cref="Nil"/> is returned.
+    /// </summary>
+    /// <param name="option">The <see cref="Option{T}"/> to convert.</param>
+    /// <typeparam name="TValue">The type of the value contained in the <see cref="Option{T}"/>.</typeparam>
+    /// <returns>
+    /// A <see cref="Result{TValue, TError}"/> representing either the successful conversion of the value or an error with <see cref="Nil"/>.
+    /// </returns>
     public static Result<TValue, Nil> ToResult<TValue>(this Option<TValue> option)
     {
         return option.HasValue switch
@@ -62,6 +105,13 @@ public static class Option
         };
     }
 
+    /// <summary>
+    /// Converts the specified <see cref="Result{TValue, TError}"/> to an <see cref="Option{TValue}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value held by the <see cref="Result{TValue, TError}"/>.</typeparam>
+    /// <typeparam name="TError">The type of the error held by the <see cref="Result{TValue, TError}"/>.</typeparam>
+    /// <param name="result">The <see cref="Result{TValue, TError}"/> to convert.</param>
+    /// <returns>An <see cref="Option{TValue}"/> containing the value of the <see cref="Result{TValue, TError}"/> if successful; otherwise, an empty <see cref="Option{TValue}"/>.</returns>
     public static Option<TValue> FromResult<TValue, TError>(this Result<TValue, TError> result)
     {
         return result.DidSucceed switch
@@ -169,6 +219,12 @@ public static class Option
         return Some(list);
     }
 
+    /// <summary>
+    /// Extracts the values from a list of <see cref="Option{T}"/> where the options contain a value.
+    /// </summary>
+    /// <param name="list">The list of <see cref="Option{T}"/> to extract values from.</param>
+    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
+    /// <returns>A list of values extracted from the specified <see cref="Option{T}"/> instances that contain a value.</returns>
     public static List<T> Values<T>(this List<Option<T>> list)
     {
         return list
