@@ -1,3 +1,9 @@
+v.2.0.0
+- Add proper nuv.Option namespace
+
+v.1.0.3
+- Add new Option.Map variant that takes an Action<T>
+
 v.1.0.2
 - Add support for NETStandard 2.0
 

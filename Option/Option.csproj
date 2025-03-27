@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <RootNamespace/>
+        <RootNamespace>nuv.Option</RootNamespace>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <Title>Option</Title>
@@ -14,7 +14,7 @@
         <RepositoryUrl>https://github.com/nnuuvv/OptionAndResult</RepositoryUrl>
         <PackageId>nuv.Option</PackageId>
         <Authors>nuv</Authors>
-        <Version>1.0.2</Version>
+        <Version>2.0.0</Version>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="nuv.Result" Version="2.0.1"/>
+        <PackageReference Include="nuv.Result" Version="3.0.0" />
     </ItemGroup>
 
 

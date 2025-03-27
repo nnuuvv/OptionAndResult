@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+namespace nuv.Result;
+
 /// <summary>
 /// Result represents the result of something that may succeed or not.
 /// 'Ok' means it was successful, 'Error' means it was not successful.
@@ -124,6 +126,30 @@ public static class Result
         {
             true => Ok<TResult, TError>(action(input.Value)),
             false => Error<TResult, TError>(input.ErrorValue),
+        };
+    }
+
+    /// <summary>
+    /// Applies a specified action to the value of a successful `Result`, returning the original result instance.
+    /// If the `Result` represents an error, the action is not executed, and the original result is returned.
+    /// </summary>
+    /// <param name="result">The `Result` instance to apply the action to.</param>
+    /// <param name="action">The action to apply to the value of a successful `Result`.</param>
+    /// <typeparam name="TValue">The type of the value associated with a successful result.</typeparam>
+    /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
+    /// <returns>The original `Result` instance, either with the same value or error.</returns>
+    public static Result<TValue, TError> Map<TValue, TError>(this Result<TValue, TError> result, Action<TValue> action)
+    {
+        var applyAction = () =>
+        {
+            action(result.Value);
+            return result;
+        };
+
+        return result.IsOk() switch
+        {
+            true => applyAction.Invoke(),
+            _ => result
         };
     }
 

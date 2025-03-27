@@ -1,3 +1,9 @@
+v.3.0.1
+- Add new Result.Map variant that takes an Action<T>
+
+v.3.0.0
+- Add proper nuv.Result namespace
+
 v.2.0.1
 - Add support for NETStandard 2.0
 

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using nuv.Result;
+
+namespace nuv.Option;
 
 /// <summary>
 /// Represents a container that may or may not hold a value of type <typeparamref name="T"/>.
@@ -100,8 +103,8 @@ public static class Option
     {
         return option.HasValue switch
         {
-            true => Result.Ok<TValue, Nil>(option.Value),
-            false => Result.Error<TValue, Nil>(new Nil()),
+            true => Result.Result.Ok<TValue, Nil>(option.Value),
+            false => Result.Result.Error<TValue, Nil>(new Nil()),
         };
     }
 
@@ -153,6 +156,28 @@ public static class Option
         {
             true => Some(action(option.Value)),
             _ => None<TResult>()
+        };
+    }
+
+    /// <summary>
+    /// Applies the specified action to the value contained in the <see cref="Option{TSource}"/>
+    /// </summary>
+    /// <param name="option">The <see cref="Option{TSource}"/> to be operated on.</param>
+    /// <param name="action">The action to invoke on the contained value, if present.</param>
+    /// <typeparam name="TSource">The type of value contained in the <see cref="Option{TSource}"/>.</typeparam>
+    /// <returns>The original <see cref="Option{TSource}"/></returns>
+    public static Option<TSource> Map<TSource>(this Option<TSource> option, Action<TSource> action)
+    {
+        var applyAction = () =>
+        {
+            action(option.Value);
+            return option;
+        };
+
+        return option.IsSome() switch
+        {
+            true => applyAction.Invoke(),
+            _ => option
         };
     }
 
