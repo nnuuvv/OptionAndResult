@@ -1,3 +1,13 @@
+v.4.0.0
+- Move Ok() and Error() from Result to Result<T, TError>
+-> Made constructor private, Ok() and Error() now the only way to create a new instance
+-> Added Result.Ok<T, TError>() and Result.Error<T, TError>() variants for backward compatability, marked as obsolete
+--> Prefer Result<T, TError>.Ok() and Result<T, TError>.Error() going forward
+
+v.3.0.2
+- Change Result type to be class instead of record 
+-> To improve ergonomics when chaining .Map and such
+
 v.3.0.1
 - Add new Result.Map variant that takes an Action<T>
 

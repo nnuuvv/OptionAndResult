@@ -5,11 +5,11 @@ basic Result type implementation
 ### Declaring results
 
 ```csharp
-    //             Ok<TValue, TError>(TValue)
-    var okResult = Ok<string, int>("everything went ok")
+    //             Result<TValue, TError>.Ok(TValue)
+    var okResult = Result<string, int>.Ok("everything went ok")
         
-    //                Error<TValue, TError>(TError)
-    var errorResult = Error<string, int>(1)
+    //                Result<TValue, TError>.Error(TError)
+    var errorResult = Result<string, int>.Error(1)
 ```
 
 ### Applying functions to values

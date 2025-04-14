@@ -10,64 +10,49 @@ namespace nuv.Option;
 /// Should be used for Optional parameters. For return values use <see cref="Result"/>
 /// </summary>
 /// <typeparam name="T">The type of value the Option can hold.</typeparam>
-public record Option<T>
+public class Option<T>
 {
+    private Option()
+    {
+    }
+
     /// <summary>
     /// May or may not have a value, check HasValue.
     /// <remarks>
     ///     <para>
-    ///     !! Should not be accessed directly outside the Option class
+    ///     !! Should not be accessed directly. 
+    ///     If you do, make sure to check <see cref="IsSome"/> or <see cref="IsNone"/> to see if there is a value
     ///     <para>
-    ///     Use <see cref="Option.Unwrap(Option{T},x)"/> instead
+    ///     Use <see cref="Option"/>.<see cref="Option.Unwrap(Option{T},x)"/> instead
     ///     </para>
     ///     </para>
     /// </remarks>
     /// </summary>
-    public T Value { get; set; }
+    public T Value { get; private set; }
 
     /// <summary>
     /// Indicates whether Value is set.
-    /// <remarks>
-    ///     <para>
-    ///     !! Should not be accessed directly outside the Option class
-    ///     <para>
-    ///     Use <see cref="Option.IsSome(Option{T})"/> or <see cref="Option.IsNone(Option{T})"/> instead
-    ///     </para>
-    ///     </para>
-    /// </remarks>
     /// </summary>
-    public bool HasValue { get; set; }
-}
+    private bool HasValue { get; set; }
 
-/// <summary>
-/// Provides a set of operations to create, transform, and work with instances of <see cref="Option{T}"/>.
-/// Represents utility methods for handling optional values.
-/// </summary>
-public static class Option
-{
     /// <summary>
     /// Determines whether the specified <see cref="Option{T}"/> contains a value.
     /// </summary>
-    /// <param name="option">The <see cref="Option{T}"/> to inspect.</param>
-    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
     /// <returns>True if the <see cref="Option{T}"/> contains a value; otherwise, false.</returns>
-    public static bool IsSome<T>(this Option<T> option) => option.HasValue;
+    public bool IsSome() => HasValue;
 
     /// <summary>
     /// Determines whether the specified <see cref="Option{T}"/> does not contain a value.
     /// </summary>
-    /// <param name="option">The <see cref="Option{T}"/> to inspect.</param>
-    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
     /// <returns>True if the <see cref="Option{T}"/> does not contain a value; otherwise, false.</returns>
-    public static bool IsNone<T>(this Option<T> option) => !option.HasValue;
+    public bool IsNone() => !HasValue;
 
     /// <summary>
     /// Creates an instance of <see cref="Option{T}"/> that holds a value.
     /// </summary>
     /// <param name="value">The value to be wrapped in an <see cref="Option{T}"/>.</param>
-    /// <typeparam name="T">The type of the value to wrap.</typeparam>
     /// <returns>An <see cref="Option{T}"/> containing the specified value.</returns>
-    public static Option<T> Some<T>(T value)
+    public static Option<T> Some(T value)
     {
         return new Option<T>()
         {
@@ -79,14 +64,41 @@ public static class Option
     /// <summary>
     /// Creates an instance of <see cref="Option{T}"/> that does not contain a value.
     /// </summary>
-    /// <typeparam name="T">The type of value the <see cref="Option{T}"/> can hold.</typeparam>
     /// <returns>An <see cref="Option{T}"/> with no value.</returns>
-    public static Option<T> None<T>()
+    public static Option<T> None()
     {
         return new Option<T>()
         {
             HasValue = false,
         };
+    }
+}
+
+/// <summary>
+/// Provides a set of operations to transform and work with instances of <see cref="Option{T}"/>.
+/// Represents utility methods for handling optional values.
+/// </summary>
+public static class Option
+{
+    /// <summary>
+    /// A wrapper around <see cref="Option{T}"/>.<see cref="Option{T}.Some"/> for convenience 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Option<T> Some<T>(T value)
+    {
+        return Option<T>.Some(value);
+    }
+
+    /// <summary>
+    /// A wrapper around <see cref="Option{T}"/>.<see cref="Option{T}.None"/> for convenience
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Option<T> None<T>()
+    {
+        return Option<T>.None();
     }
 
     /// <summary>
@@ -101,10 +113,10 @@ public static class Option
     /// </returns>
     public static Result<TValue, Nil> ToResult<TValue>(this Option<TValue> option)
     {
-        return option.HasValue switch
+        return option.IsSome() switch
         {
-            true => Result.Result.Ok<TValue, Nil>(option.Value),
-            false => Result.Result.Error<TValue, Nil>(new Nil()),
+            true => Result<TValue, Nil>.Ok(option.Value),
+            false => Result<TValue, Nil>.Error(new Nil()),
         };
     }
 
@@ -117,10 +129,10 @@ public static class Option
     /// <returns>An <see cref="Option{TValue}"/> containing the value of the <see cref="Result{TValue, TError}"/> if successful; otherwise, an empty <see cref="Option{TValue}"/>.</returns>
     public static Option<TValue> FromResult<TValue, TError>(this Result<TValue, TError> result)
     {
-        return result.DidSucceed switch
+        return result.IsOk() switch
         {
             true => Some(result.Value),
-            false => None<TValue>(),
+            false => Option<TValue>.None(),
         };
     }
 
@@ -155,7 +167,7 @@ public static class Option
         return option.IsSome() switch
         {
             true => Some(action(option.Value)),
-            _ => None<TResult>()
+            _ => Option<TResult>.None()
         };
     }
 
@@ -193,7 +205,7 @@ public static class Option
         return option.IsSome() switch
         {
             true => option.Value,
-            _ => None<T>()
+            _ => Option<T>.None()
         };
     }
 
@@ -219,7 +231,7 @@ public static class Option
         return option.IsSome() switch
         {
             true => apply(option.Value),
-            _ => None<TResult>()
+            _ => Option<TResult>.None()
         };
     }
 
@@ -237,7 +249,7 @@ public static class Option
 
         foreach (var x in options)
         {
-            if (x.IsNone()) return None<List<T>>();
+            if (x.IsNone()) return Option<List<T>>.None();
             list.Add(x.Value);
         }
 
@@ -253,7 +265,7 @@ public static class Option
     public static List<T> Values<T>(this List<Option<T>> list)
     {
         return list
-            .Where(x => x.HasValue)
+            .Where(x => x.IsSome())
             .Select(x => x.Value)
             .ToList();
     }
