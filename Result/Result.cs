@@ -4,14 +4,13 @@ using System.Linq;
 
 namespace nuv.Result;
 
-
 /// <summary>
 /// Result represents the result of something that may succeed or not.
 /// 'Ok' means it was successful; 'Error' means it was not successful.
 /// </summary>
 /// <typeparam name="TValue">Type of the value</typeparam>
 /// <typeparam name="TError">Type of the error</typeparam>
-public abstract record Result<TValue, TError> 
+public abstract record Result<TValue, TError>
 {
     /// <summary>
     /// Implicit conversion from TValue to Result{TValue, TError}
@@ -199,6 +198,7 @@ public static class Result
 
     /// <summary>
     /// Applies a specified action to the value of a successful `Result`, returning the original result instance.
+    /// 
     /// If the `Result` represents an error, the action is not executed, and the original result is returned.
     /// </summary>
     /// <param name="result">The `Result` instance to apply the action to.</param>
@@ -208,17 +208,9 @@ public static class Result
     /// <returns>The original `Result` instance, either with the same value or error.</returns>
     public static Result<TValue, TError> Map<TValue, TError>(this Result<TValue, TError> result, Action<TValue> action)
     {
-        var applyAction = (Result<TValue, TError>.Ok ok) =>
-        {
-            action(ok.Value);
-            return ok;
-        };
+        if (result is Result<TValue, TError>.Ok ok) action(ok.Value);
 
-        return result switch
-        {
-            Result<TValue, TError>.Ok ok => applyAction(ok),
-            _ => result
-        };
+        return result;
     }
 
     /// <summary>
@@ -304,6 +296,26 @@ public static class Result
             _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
         };
     }
+
+    /// <summary>
+    /// Runs an action using the Value held in the 'Error'
+    /// 
+    /// If the result is 'Ok' rather than 'Error' the action won't be called.
+    /// The original result will be returned in both cases.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="action"></param>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TError"></typeparam>
+    /// <returns>The originial Result</returns>
+    public static Result<TValue, TError> MapError<TValue, TError>(
+        this Result<TValue, TError> result, Action<TError> action)
+    {
+        if (result is Result<TValue, TError>.Error error) action(error.Value);
+
+        return result;
+    }
+
 
     /// <summary>
     /// Extracts the 'Error' value from a result, returning a default value if the result is an 'Ok'.

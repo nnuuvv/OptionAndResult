@@ -1,3 +1,6 @@
+v.5.1.0
+- Add MapError variant that takes Action<TValue>
+
 v.5.0.0
 - Change Result<TValue, TError> to be an abstract class with private ctor.
 - Ok/Error are now proper variants of Result
