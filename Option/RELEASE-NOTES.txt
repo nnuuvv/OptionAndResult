@@ -1,7 +1,17 @@
+v.3.0.0
+- Change Option<T> to be an abstract class with private ctor.
+- Some/None are now proper variants of Result
+- Required changes *should* be minimal
+- This makes proper serialization using System.Text.Json possible
+    -> Add "new OptionConverterFactory()" to your JsonSerializationOptions.Converters to enable
+
+v.2.1.0
+- Add implicit conversion for T -> Option<T>
+
 v.2.0.2
-- Moved Option.Some<TValue>() to Option<TValue>.Some(), same for None
-- Added Wrappers for Option<TValue>.Some/None as Option.Some<TValue>() / None<TValue>() for backwards compatability
-- Made Option<TValue> constructor private
+- Moved Option.Some<T>() to Option<T>.Some(), same for None
+- Added Wrappers for Option<T>.Some/None as Option.Some<T>() / None<T>() for backwards compatability
+- Made Option<T> constructor private
 
 v.2.0.1
 - Change Result type to be class instead of record 

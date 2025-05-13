@@ -5,15 +5,22 @@ basic option type implementation
 ### Declaring results
 
 ```csharp
-    //               Some(TValue)
-    var someOption = Some("some value")
+
+    //               Option.Some<T>(TValue)
+    var someOption = Option.Some("some value")
         
     // or           Option<TValue>.Some(TValue)
-    var someOpion = Option<string>.Some("some value")
+    var someOpion = new Option<string>.Some("some value")
+    
+    // or implicitly
+    Option<string> some = "";
         
         
-    //               None<TValue>()
-    var noneOption = None<string>()
+    //               Option.None<TValue>()
+    var noneOption = Option.None<string>()
+        
+    //               Option.None<TValue>()
+    var noneOption = new Option<string>.None()
 ```
 
 ### Applying functions to values
