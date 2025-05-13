@@ -1,8 +1,19 @@
+v.5.0.0
+- Change Result<TValue, TError> to be an abstract class with private ctor.
+- Ok/Error are now proper variants of Result
+- Required changes *should* be minimal
+- This makes proper serialization using System.Text.Json possible
+    -> Add "new ResultConverterFactory()" to your JsonSerializationOptions.Converters to enable
+
+v.4.1.0
+- Add implicit conversions for TValue and TError for convenience
+- Removed Obsolete marker from Ok/Error<TValue, TError> variants
+
 v.4.0.0
-- Move Ok() and Error() from Result to Result<T, TError>
+- Move Ok() and Error() from Result to Result<TValue, TError>
 -> Made constructor private, Ok() and Error() now the only way to create a new instance
--> Added Result.Ok<T, TError>() and Result.Error<T, TError>() variants for backward compatability, marked as obsolete
---> Prefer Result<T, TError>.Ok() and Result<T, TError>.Error() going forward
+-> Added Result.Ok<TValue, TError>() and Result.Error<TValue, TError>() variants for backward compatability, marked as obsolete
+--> Prefer Result<TValue, TError>.Ok() and Result<TValue, TError>.Error() going forward
 
 v.3.0.2
 - Change Result type to be class instead of record 

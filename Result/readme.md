@@ -5,11 +5,43 @@ basic Result type implementation
 ### Declaring results
 
 ```csharp
+    // declare "Ok" variant explicitly: 
     //             Result<TValue, TError>.Ok(TValue)
-    var okResult = Result<string, int>.Ok("everything went ok")
-        
+    var okResult = new Result<string, int>.Ok("everything went ok");
+    //             Result.Ok<TValue, TError>(TValue)
+    var okResult = Result.Ok<string, int>("everything went ok");
+    // or implicitly: 
+    Result<string, int> implicitOkResult = "everything went ok";
+    
+    
+    // declare "Error" variant explicitly
     //                Result<TValue, TError>.Error(TError)
-    var errorResult = Result<string, int>.Error(1)
+    var errorResult = new Result<string, int>.Error(1);
+    //                Result.Error<TValue, TError>(TError)
+    var errorResult = Result.Error<string, int>(1);
+    // or implicitly: 
+    Result<string, int> implicitErrorResult = 1;
+     
+```
+
+### Returning results
+
+```csharp
+public Result<string, int> SomeFallibleFunction() // success example
+{
+    // explicitly: 
+    return new Result<string, int>.Ok("everything went ok");
+    // or implicitly: 
+    return "everything went ok";
+}
+
+public Result<string, int> SomeFallibleFunction() // fail example
+{
+    // explicitly: 
+    return new Result<string, int>.Error(1);
+    // or implicitly: 
+    return 1;
+}
 ```
 
 ### Applying functions to values
