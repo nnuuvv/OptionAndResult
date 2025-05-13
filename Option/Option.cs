@@ -180,25 +180,17 @@ public static class Option
     }
 
     /// <summary>
-    /// Applies the specified action to the value contained in the <see cref="Option{TSource}"/>
+    /// Runs the specified action with the value contained in the <see cref="Option{T}"/>
     /// </summary>
-    /// <param name="option">The <see cref="Option{TSource}"/> to be operated on.</param>
+    /// <param name="option">The <see cref="Option{T}"/> to be operated on.</param>
     /// <param name="action">The action to invoke on the contained value, if present.</param>
-    /// <typeparam name="TSource">The type of value contained in the <see cref="Option{TSource}"/>.</typeparam>
+    /// <typeparam name="T">The type of value contained in the <see cref="Option{TSource}"/>.</typeparam>
     /// <returns>The original <see cref="Option{TSource}"/></returns>
-    public static Option<TSource> Map<TSource>(this Option<TSource> option, Action<TSource> action)
+    public static Option<T> Map<T>(this Option<T> option, Action<T> action)
     {
-        Option<TSource> ApplyAction(Option<TSource>.Some some)
-        {
-            action(some.Value);
-            return option;
-        }
+        if (option is Option<T>.Some some) action(some.Value);
 
-        return option switch
-        {
-            Option<TSource>.Some some => ApplyAction(some),
-            _ => option
-        };
+        return option;
     }
 
 

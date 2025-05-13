@@ -1,3 +1,6 @@
+v.3.0.1
+- Clean up Map implementation
+
 v.3.0.0
 - Change Option<T> to be an abstract class with private ctor.
 - Some/None are now proper variants of Result
