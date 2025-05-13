@@ -52,11 +52,11 @@ public class ResultConverter<TValue, TError> : JsonConverter<Result<TValue, TErr
             case "error":
                 if (root.TryGetProperty("Value", out var errorValueElement))
                 {
-                    var value = JsonSerializer.Deserialize<TValue>(errorValueElement.GetRawText(), options);
+                    var value = JsonSerializer.Deserialize<TError>(errorValueElement.GetRawText(), options);
 
                     if (value == null) throw new JsonException($"Result {resultType} Error Value was null");
 
-                    return new Result<TValue, TError>.Ok(value);
+                    return new Result<TValue, TError>.Error(value);
                 }
 
                 throw new JsonException("Missing 'Value' property for Error result");

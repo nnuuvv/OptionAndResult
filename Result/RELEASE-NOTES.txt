@@ -1,3 +1,6 @@
+v.5.2.0
+- Fix Implementation error in ResultConverter that would Return Ok in Error case
+
 v.5.1.0
 - Add MapError variant that takes Action<TValue>
 
