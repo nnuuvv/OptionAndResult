@@ -1,3 +1,7 @@
+v.6.0.0
+- Added Match(Func, Func)
+- Moved some functions from Result to Result<TValue, TError>
+
 v.5.2.0
 - Fix Implementation error in ResultConverter that would Return Ok in Error case
 
