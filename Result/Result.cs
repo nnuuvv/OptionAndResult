@@ -111,14 +111,12 @@ public abstract record Result<TValue, TError>
     /// <summary>
     /// Evaluates the result and invokes the appropriate function based on whether the result contains an 'Ok' or an 'Error'.
     /// </summary>
-    /// <param name="result">The result to be matched, encapsulating success ('Ok') or failure ('Error').</param>
     /// <param name="ifOk">The function to invoke if the result is 'Ok'.</param>
     /// <param name="ifError">The function to invoke if the result is 'Error'.</param>
     /// <returns>The value obtained by invoking either the 'ifOk' function or the 'ifError' function, based on the result's state.</returns>
-    public static TResult Match<TResult>(Result<TValue, TError> result,
-        Func<TValue, TResult> ifOk, Func<TError, TResult> ifError)
+    public TResult Match<TResult>(Func<TValue, TResult> ifOk, Func<TError, TResult> ifError)
     {
-        return result switch
+        return this switch
         {
             Ok ok => ifOk(ok.Value),
             Error error => ifError(error.Value),

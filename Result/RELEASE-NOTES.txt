@@ -1,3 +1,6 @@
+v.6.0.1
+- Fix Match(Func, Func) implementation
+
 v.6.0.0
 - Added Match(Func, Func)
 - Moved some functions from Result to Result<TValue, TError>
