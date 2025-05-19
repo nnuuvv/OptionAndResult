@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace nuv.Option.SwaggerGen;
 
-class OptionSchemaFilter : ISchemaFilter
+public class OptionSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
