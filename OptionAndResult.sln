@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{0548856B-DD32-4165-8715-68F931A42544}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Option.SwaggerGen", "Option.SwaggerGen\Option.SwaggerGen.csproj", "{23241BBD-7545-4D36-95C6-1F376F61A0A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Result.SwaggerGen", "Result.SwaggerGen\Result.SwaggerGen.csproj", "{59DF66AA-103F-4AAE-B45E-EE550883391E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{0548856B-DD32-4165-8715-68F931A42544}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0548856B-DD32-4165-8715-68F931A42544}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0548856B-DD32-4165-8715-68F931A42544}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23241BBD-7545-4D36-95C6-1F376F61A0A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23241BBD-7545-4D36-95C6-1F376F61A0A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23241BBD-7545-4D36-95C6-1F376F61A0A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23241BBD-7545-4D36-95C6-1F376F61A0A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59DF66AA-103F-4AAE-B45E-EE550883391E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59DF66AA-103F-4AAE-B45E-EE550883391E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59DF66AA-103F-4AAE-B45E-EE550883391E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59DF66AA-103F-4AAE-B45E-EE550883391E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
