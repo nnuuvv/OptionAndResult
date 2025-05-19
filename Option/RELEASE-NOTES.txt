@@ -1,3 +1,6 @@
+v.3.1.0
+- Registered OptionConverterFactory on Option<T>. No longer needs to be manually enabled.
+
 v.3.0.0
 - Change Option<T> to be an abstract class with private ctor.
 - Some/None are now proper variants of Result

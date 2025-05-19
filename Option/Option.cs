@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using nuv.Result;
 
 namespace nuv.Option;
@@ -10,6 +11,7 @@ namespace nuv.Option;
 /// Should be used for Optional parameters. For return values use <see cref="Result"/>
 /// </summary>
 /// <typeparam name="T">The type of value the Option can hold.</typeparam>
+[JsonConverter(typeof(OptionConverterFactory))]
 public abstract record Option<T>
 {
     /// <summary>

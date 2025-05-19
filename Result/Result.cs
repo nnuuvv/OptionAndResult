@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Text.Json.Serialization;
 
 namespace nuv.Result;
 
@@ -10,6 +12,7 @@ namespace nuv.Result;
 /// </summary>
 /// <typeparam name="TValue">Type of the value</typeparam>
 /// <typeparam name="TError">Type of the error</typeparam>
+[JsonConverter(typeof(ResultConverterFactory))]
 public abstract record Result<TValue, TError>
 {
     private Result()

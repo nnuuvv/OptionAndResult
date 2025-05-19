@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using nuv.Option;
 using nuv.Result;
 
 namespace Tests;
@@ -8,23 +7,12 @@ namespace Tests;
 [TestFixture]
 public class ResultJsonTests
 {
-    public static readonly JsonSerializerOptions JsonSerializerOptions = new()
-    {
-        Converters =
-        {
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
-            new OptionConverterFactory(),
-            new ResultConverterFactory()
-        },
-        PropertyNameCaseInsensitive = true,
-    };
-
     [TestCaseSource(nameof(BasicResults))]
     public void BasicResultTest(Result<string, int> result)
     {
-        var json = JsonSerializer.Serialize(result, JsonSerializerOptions);
+        var json = JsonSerializer.Serialize(result);
 
-        var deserialized = JsonSerializer.Deserialize<Result<string, int>>(json, JsonSerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<Result<string, int>>(json);
 
         Assert.That(deserialized, Is.EqualTo(result));
     }
@@ -38,9 +26,9 @@ public class ResultJsonTests
     [TestCaseSource(nameof(ComplexResults))]
     public void ComplexResultTest(Result<TestExample, ExampleClass> result)
     {
-        var json = JsonSerializer.Serialize(result, JsonSerializerOptions);
+        var json = JsonSerializer.Serialize(result);
 
-        var deserialized = JsonSerializer.Deserialize<Result<TestExample, ExampleClass>>(json, JsonSerializerOptions);
+        var deserialized = JsonSerializer.Deserialize<Result<TestExample, ExampleClass>>(json);
 
         Assert.That(deserialized, Is.EqualTo(result));
     }
