@@ -128,6 +128,27 @@ public abstract record Result<TValue, TError>
     }
 
     /// <summary>
+    /// Executes the provided actions based on whether the result is successful or an error.
+    /// </summary>
+    /// <param name="ifOk">The action to be executed if the result is successful (Ok).</param>
+    /// <param name="ifError">The action to be executed if the result is an error.</param>
+    /// <returns>The current instance of the result.</returns>
+    public Result<TValue, TError> Match(Action<TValue> ifOk, Action<TError> ifError)
+    {
+        switch (this)
+        {
+            case Ok ok:
+                ifOk(ok.Value);
+                break;
+            case Error error:
+                ifError(error.Value);
+                break;
+        }
+
+        return this;
+    }
+
+    /// <summary>
     /// Updates a value held within the 'Ok' of a 'Result' by calling a given function on it.
     /// 
     /// If the 'Result' is an 'Error' rather than 'Ok', the function is not called and the 'Result' stays the same.

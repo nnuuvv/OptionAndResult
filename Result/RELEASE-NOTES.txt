@@ -1,3 +1,6 @@
+v.6.2.0
+- Add Action<> version of Match
+
 v.6.1.0
 - Registered ConverterFactory on Result<T,E>. No longer needs to be manually enabled.
 
