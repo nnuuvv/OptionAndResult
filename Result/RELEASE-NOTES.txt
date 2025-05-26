@@ -1,3 +1,7 @@
+v.6.3.0
+- Add MapAsync and TryAsync
+- Add Result.Ok<T> and .Error<T> with Exception as their default error value for convenience
+
 v.6.2.0
 - Add Action<> version of Match
 

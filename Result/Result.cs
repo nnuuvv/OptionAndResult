@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace nuv.Result;
 
@@ -10,10 +10,10 @@ namespace nuv.Result;
 /// Result represents the result of something that may succeed or not.
 /// 'Ok' means it was successful; 'Error' means it was not successful.
 /// </summary>
-/// <typeparam name="TValue">Type of the value</typeparam>
-/// <typeparam name="TError">Type of the error</typeparam>
+/// <typeparam name="T">Type of the value</typeparam>
+/// <typeparam name="TE">Type of the error</typeparam>
 [JsonConverter(typeof(ResultConverterFactory))]
-public abstract record Result<TValue, TError>
+public abstract record Result<T, TE>
 {
     private Result()
     {
@@ -24,26 +24,26 @@ public abstract record Result<TValue, TError>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static implicit operator Result<TValue, TError>(TValue value) => new Ok(value);
+    public static implicit operator Result<T, TE>(T value) => new Ok(value);
 
     /// <summary>
     /// Creates a successful result with the specified value.
     /// </summary>
     /// <param name="Value">The value associated with a successful result.</param>
     /// <returns>A new result instance representing a successful operation with the specified value.</returns>
-    public sealed record Ok(TValue Value) : Result<TValue, TError>
+    public sealed record Ok(T Value) : Result<T, TE>
     {
         /// <summary>
         /// Value held by this Result.
         /// Prefer using <see cref="Result{TValue,TError}.Unwrap"/>
         /// </summary>
-        public TValue Value { get; set; } = Value;
+        public T Value { get; set; } = Value;
 
         /// <summary>
         /// Deconstructs the current instance into its constituent value.
         /// </summary>
         /// <param name="value">The value associated with the successful result.</param>
-        public void Deconstruct(out TValue value)
+        public void Deconstruct(out T value)
         {
             value = Value;
         }
@@ -55,44 +55,83 @@ public abstract record Result<TValue, TError>
     /// </summary>
     /// <param name="error"></param>
     /// <returns></returns>
-    public static implicit operator Result<TValue, TError>(TError error) => new Error(error);
+    public static implicit operator Result<T, TE>(TE error) => new Error(error);
 
     /// <summary>
     /// Creates a new result instance representing an error.
     /// </summary>
     /// <param name="Value">The error value associated with the unsuccessful result.</param>
     /// <returns>A result instance encapsulating the provided error value.</returns>
-    public sealed record Error(TError Value) : Result<TValue, TError>
+    public sealed record Error(TE Value) : Result<T, TE>
     {
         /// <summary>
         /// Value held by this Result.
         /// Prefer using <see cref="Result{TValue,TError}.UnwrapError"/>
         /// </summary>
-        public TError Value { get; set; } = Value;
+        public TE Value { get; set; } = Value;
 
         /// <summary>
         /// Deconstructs the current instance into its constituent value.
         /// </summary>
         /// <param name="error">The value associated with the successful result.</param>
-        public void Deconstruct(out TError error)
+        public void Deconstruct(out TE error)
         {
             error = Value;
         }
     }
+}
 
-    #region Functions
+/// <summary>
+/// Result represents the result of something that may succeed or not.
+/// 'Ok' means it was successful, 'Error' means it was not successful.
+/// </summary>
+public static class Result
+{
+    /// <summary>
+    /// A wrapper around <see cref="Result{T,TE}"/>.<see cref="Result{T,TE}.Ok"/> 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TE"></typeparam>
+    /// <returns></returns>
+    public static Result<T, TE> Ok<T, TE>(T value) => new Result<T, TE>.Ok(value);
+
+    /// <summary>
+    /// A wrapper around <see cref="Result{T,TE}"/>.<see cref="Result{T,TE}.Ok"/>
+    /// With Exception as the default Error type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Result<T, Exception> Ok<T>(T value) => new Result<T, Exception>.Ok(value);
+
+
+    /// <summary>
+    /// A wrapper around <see cref="Result{T,TE}"/>.<see cref="Result{T,TE}.Error"/> 
+    /// </summary>
+    /// <param name="error"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TE"></typeparam>
+    /// <returns></returns>
+    public static Result<T, TE> Error<T, TE>(TE error) => new Result<T, TE>.Error(error);
+
+    /// <summary>
+    /// A wrapper around <see cref="Result{T,TE}"/>.<see cref="Result{T,TE}.Error"/>
+    /// With Exception as the default Error type
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static Result<T, Exception> Error<T>(Exception exception) => new Result<T, Exception>.Error(exception);
 
     /// <summary>
     /// Checks whether the given result represents a successful operation.
     /// </summary>
     /// <returns>True if the result represents a successful operation; otherwise, false.</returns>
-    public bool IsOk()
+    public static bool IsOk<T, TE>(this Result<T, TE> result)
     {
-        return this switch
+        return result switch
         {
-            Error => false,
-            Ok => true,
-            _ => throw new ArgumentOutOfRangeException()
+            Result<T, TE>.Ok => true,
+            _ => false
         };
     }
 
@@ -100,13 +139,12 @@ public abstract record Result<TValue, TError>
     /// Determines whether the given result represents an unsuccessful operation.
     /// </summary>
     /// <returns>True if the result represents an unsuccessful operation; otherwise, false.</returns>
-    public bool IsError()
+    public static bool IsError<T, TE>(this Result<T, TE> result)
     {
-        return this switch
+        return result switch
         {
-            Error => true,
-            Ok => false,
-            _ => throw new ArgumentOutOfRangeException()
+            Result<T, TE>.Error => true,
+            _ => false
         };
     }
 
@@ -114,15 +152,19 @@ public abstract record Result<TValue, TError>
     /// <summary>
     /// Evaluates the result and invokes the appropriate function based on whether the result contains an 'Ok' or an 'Error'.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="ifOk">The function to invoke if the result is 'Ok'.</param>
     /// <param name="ifError">The function to invoke if the result is 'Error'.</param>
+    /// <typeparam name="T">Type of the source value</typeparam>
+    /// <typeparam name="TE">Type of the Error</typeparam>
+    /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns>The value obtained by invoking either the 'ifOk' function or the 'ifError' function, based on the result's state.</returns>
-    public TResult Match<TResult>(Func<TValue, TResult> ifOk, Func<TError, TResult> ifError)
+    public static TR Match<T, TE, TR>(this Result<T, TE> result, Func<T, TR> ifOk, Func<TE, TR> ifError)
     {
-        return this switch
+        return result switch
         {
-            Ok ok => ifOk(ok.Value),
-            Error error => ifError(error.Value),
+            Result<T, TE>.Ok ok => ifOk(ok.Value),
+            Result<T, TE>.Error error => ifError(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -130,22 +172,23 @@ public abstract record Result<TValue, TError>
     /// <summary>
     /// Executes the provided actions based on whether the result is successful or an error.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="ifOk">The action to be executed if the result is successful (Ok).</param>
     /// <param name="ifError">The action to be executed if the result is an error.</param>
     /// <returns>The current instance of the result.</returns>
-    public Result<TValue, TError> Match(Action<TValue> ifOk, Action<TError> ifError)
+    public static Result<T, TE> Match<T, TE>(this Result<T, TE> result, Action<T> ifOk, Action<TE> ifError)
     {
-        switch (this)
+        switch (result)
         {
-            case Ok ok:
+            case Result<T, TE>.Ok ok:
                 ifOk(ok.Value);
                 break;
-            case Error error:
+            case Result<T, TE>.Error error:
                 ifError(error.Value);
                 break;
         }
 
-        return this;
+        return result;
     }
 
     /// <summary>
@@ -153,15 +196,18 @@ public abstract record Result<TValue, TError>
     /// 
     /// If the 'Result' is an 'Error' rather than 'Ok', the function is not called and the 'Result' stays the same.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="action"></param>
-    /// <typeparam name="TResult"></typeparam>
+    /// <typeparam name="T">Type of the source value</typeparam>
+    /// <typeparam name="TE">Type of the Error</typeparam>
+    /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns></returns>
-    public Result<TResult, TError> Map<TResult>(Func<TValue, TResult> action)
+    public static Result<TR, TE> Map<T, TE, TR>(this Result<T, TE> result, Func<T, TR> action)
     {
-        return this switch
+        return result switch
         {
-            Ok ok => new Result<TResult, TError>.Ok(action(ok.Value)),
-            Error error => new Result<TResult, TError>.Error(error.Value),
+            Result<T, TE>.Ok ok => new Result<TR, TE>.Ok(action(ok.Value)),
+            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -171,29 +217,50 @@ public abstract record Result<TValue, TError>
     /// 
     /// If the `Result` represents an error, the action is not executed, and the original result is returned.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="action">The action to apply to the value of a successful `Result`.</param>
-    /// <typeparam name="TValue">The type of the value associated with a successful result.</typeparam>
-    /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TE"></typeparam>
     /// <returns>The original `Result` instance, either with the same value or error.</returns>
-    public Result<TValue, TError> Map(Action<TValue> action)
+    public static Result<T, TE> Map<T, TE>(this Result<T, TE> result, Action<T> action)
     {
-        if (this is Ok ok) action(ok.Value);
+        if (result is Result<T, TE>.Ok ok) action(ok.Value);
 
-        return this;
+        return result;
     }
-
+    
+    /// <summary>
+    /// Updates a value held within the 'Ok' of a 'Result' by calling a given function on it.
+    /// 
+    /// If the 'Result' is an 'Error' rather than 'Ok', the function is not called and the 'Result' stays the same.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="action"></param>
+    /// <typeparam name="T">Type of the source value</typeparam>
+    /// <typeparam name="TE">Type of the Error</typeparam>
+    /// <typeparam name="TR">Type of the result value</typeparam>
+    /// <returns></returns>
+    public static async Task<Result<TR, TE>> MapAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<TR>> action)
+    {
+        return result switch
+        {
+            Result<T, TE>.Ok ok => new Result<TR, TE>.Ok(await action(ok.Value)),
+            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+    
     /// <summary>
     /// Extracts the value from a 'Result', returning a default value if there is none.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="defaultValue"></param>
-    /// <typeparam name="TValue"></typeparam>
-    /// <typeparam name="TError"></typeparam>
     /// <returns></returns>
-    public TValue Unwrap(TValue defaultValue)
+    public static T Unwrap<T, TE>(this Result<T, TE> result, T defaultValue)
     {
-        return this switch
+        return result switch
         {
-            Ok ok => ok.Value,
+            Result<T, TE>.Ok ok => ok.Value,
             _ => defaultValue
         };
     }
@@ -208,15 +275,44 @@ public abstract record Result<TValue, TError>
     /// This function is the equivalent of calling `map` followed by `flatten`, and
     /// it is useful for chaining together multiple functions that return `Result`.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="apply"></param>
-    /// <typeparam name="TResult"></typeparam>
+    /// <typeparam name="T">Type of the source value</typeparam>
+    /// <typeparam name="TE">Type of the Error</typeparam>
+    /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns></returns>
-    public Result<TResult, TError> Try<TResult>(Func<TValue, Result<TResult, TError>> apply)
+    public static Result<TR, TE> Try<T, TE, TR>(this Result<T, TE> result, Func<T, Result<TR, TE>> apply)
     {
-        return this switch
+        return result switch
         {
-            Ok ok => apply(ok.Value),
-            Error error => new Result<TResult, TError>.Error(error.Value),
+            Result<T, TE>.Ok ok => apply(ok.Value),
+            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+    
+    /// <summary>
+    /// Updates a value held within the `Ok` of a `Result` by calling a given function
+    /// on it, where the given function also returns a `Result`. The two results are
+    /// then merged together into one `Result`.
+    /// 
+    /// If the `Result` is an `Error` rather than `Ok` the function is not called and the original 'Error' is returned.
+    /// 
+    /// This function is the equivalent of calling `map` followed by `flatten`, and
+    /// it is useful for chaining together multiple functions that return `Result`.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="apply"></param>
+    /// <typeparam name="T">Type of the source value</typeparam>
+    /// <typeparam name="TE">Type of the Error</typeparam>
+    /// <typeparam name="TR">Type of the result value</typeparam>
+    /// <returns></returns>
+    public static async Task<Result<TR, TE>> TryAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<Result<TR, TE>>> apply)
+    {
+        return result switch
+        {
+            Result<T, TE>.Ok ok => await apply(ok.Value),
+            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -228,15 +324,18 @@ public abstract record Result<TValue, TError>
     /// But the value will be transferred into a new 'Result' with the same Error type.
     /// Since the returned 'Error' types need to match (C# limitation)
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="action"></param>
-    /// <typeparam name="TErrorResult"></typeparam>
+    /// <typeparam name="T">Type of the value</typeparam>
+    /// <typeparam name="TE">Type of the source error </typeparam>
+    /// <typeparam name="TEr">Type of the result error</typeparam>
     /// <returns></returns>
-    public Result<TValue, TErrorResult> MapError<TErrorResult>(Func<TError, TErrorResult> action)
+    public static Result<T, TEr> MapError<T, TE, TEr>(this Result<T, TE> result, Func<TE, TEr> action)
     {
-        return this switch
+        return result switch
         {
-            Ok ok => new Result<TValue, TErrorResult>.Ok(ok.Value),
-            Error error => new Result<TValue, TErrorResult>.Error(action(error.Value)),
+            Result<T, TE>.Ok ok => new Result<T, TEr>.Ok(ok.Value),
+            Result<T, TE>.Error error => new Result<T, TEr>.Error(action(error.Value)),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -247,83 +346,31 @@ public abstract record Result<TValue, TError>
     /// If the result is 'Ok' rather than 'Error' the action won't be called.
     /// The original result will be returned in both cases.
     /// </summary>
+    /// <param name="result"></param>
     /// <param name="action"></param>
     /// <returns>The originial Result</returns>
-    public Result<TValue, TError> MapError(Action<TError> action)
+    public static Result<T, TE> MapError<T, TE>(this Result<T, TE> result, Action<TE> action)
     {
-        if (this is Error error) action(error.Value);
-
-        return this;
-    }
-
-    /// <summary>
-    /// Extracts the 'Error' value from a result, returning a default value if the result is an 'Ok'.
-    /// </summary>
-    /// <param name="defaultError"></param>
-    /// <typeparam name="TError"></typeparam>
-    /// <returns></returns>
-    public TError UnwrapError(TError defaultError)
-    {
-        return this switch
-        {
-            Error error => error.Value,
-            _ => defaultError,
-        };
-    }
-
-    #endregion
-}
-
-/// <summary>
-/// Result represents the result of something that may succeed or not.
-/// 'Ok' means it was successful, 'Error' means it was not successful.
-/// </summary>
-public static class Result
-{
-    private static void Test()
-    {
-        var someValue = new Result<string, object>.Ok("hehe");
-
-        WithRetry(() => someValue.Try(x => new Result<int, object>.Ok(x.Length)));
-    }
-
-    private static Result<TResult, TError> WithRetry<TResult, TError>(Func<Result<TResult, TError>> functionToRetry,
-        int retryCount = 1)
-    {
-        Result<TResult, TError> result;
-        do
-        {
-            result = functionToRetry();
-            if (result.IsOk()) return result;
-
-            retryCount--;
-        } while (retryCount > 0);
+        if (result is Result<T, TE>.Error error) action(error.Value);
 
         return result;
     }
 
     /// <summary>
-    /// A wrapper around <see cref="Result"/>.<see cref="Ok{TValue,TError}"/> for backward compatability
+    /// Extracts the 'Error' value from a result, returning a default value if the result is an 'Ok'.
     /// </summary>
-    /// <param name="value"></param>
-    /// <typeparam name="TValue"></typeparam>
-    /// <typeparam name="TError"></typeparam>
+    /// <param name="result"></param>
+    /// <param name="defaultError"></param>
+    /// <typeparam name="TE"></typeparam>
+    /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static Result<TValue, TError> Ok<TValue, TError>(TValue value)
+    public static TE UnwrapError<T, TE>(this Result<T, TE> result, TE defaultError)
     {
-        return new Result<TValue, TError>.Ok(value);
-    }
-
-    /// <summary>
-    /// A wrapper around <see cref="Result"/>.<see cref="Error{TValue,TError}"/> for backward compatability
-    /// </summary>
-    /// <param name="error"></param>
-    /// <typeparam name="TValue"></typeparam>
-    /// <typeparam name="TError"></typeparam>
-    /// <returns></returns>
-    public static Result<TValue, TError> Error<TValue, TError>(TError error)
-    {
-        return new Result<TValue, TError>.Error(error);
+        return result switch
+        {
+            Result<T, TE>.Error error => error.Value,
+            _ => defaultError,
+        };
     }
 
 
