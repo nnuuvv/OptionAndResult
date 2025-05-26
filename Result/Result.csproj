@@ -14,7 +14,7 @@
         <RepositoryUrl>https://github.com/nnuuvv/OptionAndResult</RepositoryUrl>
         <PackageId>nuv.Result</PackageId>
         <Authors>nuv</Authors>
-        <Version>6.3.0</Version>
+        <Version>6.4.0</Version>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 

@@ -190,6 +190,26 @@ public static class Result
 
         return result;
     }
+    
+    /// <summary>
+    /// Evaluates the result and invokes the appropriate function based on whether the result contains an 'Ok' or an 'Error'.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="ifOk">The function to invoke if the result is 'Ok'.</param>
+    /// <param name="ifError">The function to invoke if the result is 'Error'.</param>
+    /// <typeparam name="T">Type of the source value</typeparam>
+    /// <typeparam name="TE">Type of the Error</typeparam>
+    /// <typeparam name="TR">Type of the result value</typeparam>
+    /// <returns>The value obtained by invoking either the 'ifOk' function or the 'ifError' function, based on the result's state.</returns>
+    public static async Task<TR> MatchAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<TR>> ifOk, Func<TE, Task<TR>> ifError)
+    {
+        return result switch
+        {
+            Result<T, TE>.Ok ok => await ifOk(ok.Value),
+            Result<T, TE>.Error error => await ifError(error.Value),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
 
     /// <summary>
     /// Updates a value held within the 'Ok' of a 'Result' by calling a given function on it.
