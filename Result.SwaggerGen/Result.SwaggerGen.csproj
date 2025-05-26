@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="nuv.Result" Version="6.1.0" />
+      <PackageReference Include="nuv.Result" Version="6.2.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.1" />
     </ItemGroup>
 

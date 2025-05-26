@@ -23,7 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="nuv.Result" Version="5.0.0" />
+        <PackageReference Include="nuv.Result" Version="6.2.0" />
         <PackageReference Include="System.Text.Json" Version="9.0.4" />
     </ItemGroup>
 
