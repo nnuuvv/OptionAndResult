@@ -98,3 +98,24 @@ public Result<string, int> SomeFallibleFunction() // fail example
     okResult.Unwrap("whoops");
     // -> "everything went ok"
 ```
+
+### Pattern matching
+
+```csharp
+    // with a normal switch statement
+    switch (okResult)
+    {
+        case Result<string, int>.Ok ok: 
+            Console.WriteLine(ok.Value);
+            break;
+        case Result<string, int>.Error error: 
+            Console.WriteLine(error.Value);
+            break;        
+    }
+    
+    // or with the build in .match function
+    okResult.Match(
+        ok => Console.WriteLine(ok),
+        error => Console.WriteLine(error)
+    );
+```
