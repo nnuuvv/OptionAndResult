@@ -377,6 +377,22 @@ public static class Result
     }
 
     /// <summary>
+    /// Replaces the error value in a Result instance with a new error value, while keeping the successful value unchanged if applicable.
+    /// </summary>
+    /// <param name="result">The Result instance to process.</param>
+    /// <param name="newError">The new error value to be used if the Result instance represents an error.</param>
+    /// <returns>A new Result instance with the error value replaced by <paramref name="newError"/>, or the original success value if the instance represents success.</returns>
+    public static Result<T, TEr> ReplaceError<T, TE, TEr>(this Result<T, TE> result, TEr newError)
+    {
+        return result switch
+        {
+            Result<T,TE>.Ok ok => new Result<T, TEr>.Ok(ok.Value),
+            Result<T,TE>.Error => new Result<T, TEr>.Error(newError),
+            _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
+        };
+    }
+
+    /// <summary>
     /// Extracts the 'Error' value from a result, returning a default value if the result is an 'Ok'.
     /// </summary>
     /// <param name="result"></param>
