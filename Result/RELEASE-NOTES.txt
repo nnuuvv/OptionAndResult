@@ -1,3 +1,7 @@
+v.6.6.0
+-- Add TryCatch wrapper for both Result -> Result and T -> Result
+-- Add Or and LazyOr
+
 v.6.5.0
 - Add ReplaceError
 

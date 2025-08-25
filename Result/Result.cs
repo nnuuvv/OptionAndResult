@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -126,6 +127,7 @@ public static class Result
     /// Checks whether the given result represents a successful operation.
     /// </summary>
     /// <returns>True if the result represents a successful operation; otherwise, false.</returns>
+    [Pure]
     public static bool IsOk<T, TE>(this Result<T, TE> result)
     {
         return result switch
@@ -139,6 +141,7 @@ public static class Result
     /// Determines whether the given result represents an unsuccessful operation.
     /// </summary>
     /// <returns>True if the result represents an unsuccessful operation; otherwise, false.</returns>
+    [Pure]
     public static bool IsError<T, TE>(this Result<T, TE> result)
     {
         return result switch
@@ -159,6 +162,7 @@ public static class Result
     /// <typeparam name="TE">Type of the Error</typeparam>
     /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns>The value obtained by invoking either the 'ifOk' function or the 'ifError' function, based on the result's state.</returns>
+    [Pure]
     public static TR Match<T, TE, TR>(this Result<T, TE> result, Func<T, TR> ifOk, Func<TE, TR> ifError)
     {
         return result switch
@@ -176,6 +180,7 @@ public static class Result
     /// <param name="ifOk">The action to be executed if the result is successful (Ok).</param>
     /// <param name="ifError">The action to be executed if the result is an error.</param>
     /// <returns>The current instance of the result.</returns>
+    [Pure]
     public static Result<T, TE> Match<T, TE>(this Result<T, TE> result, Action<T> ifOk, Action<TE> ifError)
     {
         switch (result)
@@ -190,7 +195,7 @@ public static class Result
 
         return result;
     }
-    
+
     /// <summary>
     /// Evaluates the result and invokes the appropriate function based on whether the result contains an 'Ok' or an 'Error'.
     /// </summary>
@@ -201,7 +206,9 @@ public static class Result
     /// <typeparam name="TE">Type of the Error</typeparam>
     /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns>The value obtained by invoking either the 'ifOk' function or the 'ifError' function, based on the result's state.</returns>
-    public static async Task<TR> MatchAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<TR>> ifOk, Func<TE, Task<TR>> ifError)
+    [Pure]
+    public static async Task<TR> MatchAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<TR>> ifOk,
+        Func<TE, Task<TR>> ifError)
     {
         return result switch
         {
@@ -222,6 +229,7 @@ public static class Result
     /// <typeparam name="TE">Type of the Error</typeparam>
     /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns></returns>
+    [Pure]
     public static Result<TR, TE> Map<T, TE, TR>(this Result<T, TE> result, Func<T, TR> action)
     {
         return result switch
@@ -242,13 +250,14 @@ public static class Result
     /// <typeparam name="T"></typeparam>
     /// <typeparam name="TE"></typeparam>
     /// <returns>The original `Result` instance, either with the same value or error.</returns>
+    [Pure]
     public static Result<T, TE> Map<T, TE>(this Result<T, TE> result, Action<T> action)
     {
         if (result is Result<T, TE>.Ok ok) action(ok.Value);
 
         return result;
     }
-    
+
     /// <summary>
     /// Updates a value held within the 'Ok' of a 'Result' by calling a given function on it.
     /// 
@@ -260,6 +269,7 @@ public static class Result
     /// <typeparam name="TE">Type of the Error</typeparam>
     /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns></returns>
+    [Pure]
     public static async Task<Result<TR, TE>> MapAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<TR>> action)
     {
         return result switch
@@ -269,13 +279,14 @@ public static class Result
             _ => throw new ArgumentOutOfRangeException()
         };
     }
-    
+
     /// <summary>
     /// Extracts the value from a 'Result', returning a default value if there is none.
     /// </summary>
     /// <param name="result"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
+    [Pure]
     public static T Unwrap<T, TE>(this Result<T, TE> result, T defaultValue)
     {
         return result switch
@@ -301,6 +312,7 @@ public static class Result
     /// <typeparam name="TE">Type of the Error</typeparam>
     /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns></returns>
+    [Pure]
     public static Result<TR, TE> Try<T, TE, TR>(this Result<T, TE> result, Func<T, Result<TR, TE>> apply)
     {
         return result switch
@@ -310,7 +322,7 @@ public static class Result
             _ => throw new ArgumentOutOfRangeException()
         };
     }
-    
+
     /// <summary>
     /// Updates a value held within the `Ok` of a `Result` by calling a given function
     /// on it, where the given function also returns a `Result`. The two results are
@@ -327,7 +339,9 @@ public static class Result
     /// <typeparam name="TE">Type of the Error</typeparam>
     /// <typeparam name="TR">Type of the result value</typeparam>
     /// <returns></returns>
-    public static async Task<Result<TR, TE>> TryAsync<T, TE, TR>(this Result<T, TE> result, Func<T, Task<Result<TR, TE>>> apply)
+    [Pure]
+    public static async Task<Result<TR, TE>> TryAsync<T, TE, TR>(this Result<T, TE> result,
+        Func<T, Task<Result<TR, TE>>> apply)
     {
         return result switch
         {
@@ -350,6 +364,7 @@ public static class Result
     /// <typeparam name="TE">Type of the source error </typeparam>
     /// <typeparam name="TEr">Type of the result error</typeparam>
     /// <returns></returns>
+    [Pure]
     public static Result<T, TEr> MapError<T, TE, TEr>(this Result<T, TE> result, Func<TE, TEr> action)
     {
         return result switch
@@ -369,6 +384,7 @@ public static class Result
     /// <param name="result"></param>
     /// <param name="action"></param>
     /// <returns>The originial Result</returns>
+    [Pure]
     public static Result<T, TE> MapError<T, TE>(this Result<T, TE> result, Action<TE> action)
     {
         if (result is Result<T, TE>.Error error) action(error.Value);
@@ -382,12 +398,13 @@ public static class Result
     /// <param name="result">The Result instance to process.</param>
     /// <param name="newError">The new error value to be used if the Result instance represents an error.</param>
     /// <returns>A new Result instance with the error value replaced by <paramref name="newError"/>, or the original success value if the instance represents success.</returns>
+    [Pure]
     public static Result<T, TEr> ReplaceError<T, TE, TEr>(this Result<T, TE> result, TEr newError)
     {
         return result switch
         {
-            Result<T,TE>.Ok ok => new Result<T, TEr>.Ok(ok.Value),
-            Result<T,TE>.Error => new Result<T, TEr>.Error(newError),
+            Result<T, TE>.Ok ok => new Result<T, TEr>.Ok(ok.Value),
+            Result<T, TE>.Error => new Result<T, TEr>.Error(newError),
             _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
         };
     }
@@ -400,6 +417,7 @@ public static class Result
     /// <typeparam name="TE"></typeparam>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
+    [Pure]
     public static TE UnwrapError<T, TE>(this Result<T, TE> result, TE defaultError)
     {
         return result switch
@@ -417,6 +435,7 @@ public static class Result
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TError"></typeparam>
     /// <returns></returns>
+    [Pure]
     public static Result<TValue, TError> Flatten<TValue, TError>(this Result<Result<TValue, TError>, TError> result)
     {
         return result switch
@@ -434,6 +453,7 @@ public static class Result
     /// <param name="result"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
+    [Pure]
     public static T UnwrapBoth<T>(this Result<T, T> result)
     {
         return result switch
@@ -453,6 +473,7 @@ public static class Result
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TError"></typeparam>
     /// <returns></returns>
+    [Pure]
     public static Result<List<TValue>, TError> All<TValue, TError>(this List<Result<TValue, TError>> results)
     {
         var list = new List<TValue>();
@@ -479,6 +500,7 @@ public static class Result
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TError"></typeparam>
     /// <returns></returns>
+    [Pure]
     public static Tuple<List<TValue>, List<TError>> Partition<TValue, TError>(this List<Result<TValue, TError>> results)
     {
         var values = new List<TValue>();
@@ -508,6 +530,7 @@ public static class Result
     /// <typeparam name="TError">The type of the error associated with an unsuccessful result.</typeparam>
     /// <param name="list">The list of Result objects to evaluate.</param>
     /// <returns>A list containing the values from all successful results.</returns>
+    [Pure]
     public static List<TValue> Values<TValue, TError>(this List<Result<TValue, TError>> list)
     {
         return list
@@ -520,5 +543,77 @@ public static class Result
             // cant be null, just filtered
             .Select(x => x!.Value)
             .ToList();
+    }
+
+    /// <summary>
+    /// Calls a function that might throw an exception in a try-catch block.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="mightThrow"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TR"></typeparam>
+    /// <returns>The Result of the function, the thrown exception or the previous error if it was already the error variant</returns>
+    [Pure]
+    public static Result<TR, Exception> TryCatch<T, TR>(this Result<T, Exception> result, Func<T, TR> mightThrow)
+    {
+        try
+        {
+            return result.Map(mightThrow);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    /// <summary>
+    /// Calls the function that might throw with the value in a try catch block.
+    /// Returns either the result of the function executing in an Ok() or the exception in an Error()
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="mightThrow"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TR"></typeparam>
+    /// <returns></returns>
+    [Pure]
+    public static Result<TR, Exception> TryCatch<T, TR>(this T value, Func<T, TR> mightThrow)
+    {
+        try
+        {
+            return mightThrow(value);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    /// <summary>
+    /// Returns the first value if it is 'Ok', otherwise returns the second value
+    /// </summary>
+    /// <param name="first"></param>
+    /// <param name="second"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TE"></typeparam>
+    /// <returns></returns>
+    [Pure]
+    public static Result<T, TE> Or<T, TE>(this Result<T, TE> first, Result<T, TE> second)
+    {
+        return first.Match(_ => first, _ => second);
+    }
+
+
+    /// <summary>
+    /// Returns the first value if it is 'Ok', otherwise evaluates the given function for a fallback value.
+    /// </summary>
+    /// <param name="first"></param>
+    /// <param name="second"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TE"></typeparam>
+    /// <returns></returns>
+    [Pure]
+    public static Result<T, TE> LazyOr<T, TE>(this Result<T, TE> first, Func<Result<T, TE>> second)
+    {
+        return first.Match(_ => first, _ => second());
     }
 }
