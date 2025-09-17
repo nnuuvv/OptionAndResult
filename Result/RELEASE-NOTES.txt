@@ -1,6 +1,11 @@
+v.7.0.0
+- Map(arg, Action<T>) renamed to Tap(arg, Action<T>)
+- MapError(arg, Action<T>) renamed to TapError(arg, Action<T>)
+- Added FromNullable and ToNullable
+
 v.6.6.0
--- Add TryCatch wrapper for both Result -> Result and T -> Result
--- Add Or and LazyOr
+- Add TryCatch wrapper for both Result -> Result and T -> Result
+- Add Or and LazyOr
 
 v.6.5.0
 - Add ReplaceError

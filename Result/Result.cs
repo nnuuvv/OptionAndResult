@@ -36,7 +36,7 @@ public abstract record Result<T, TE>
     {
         /// <summary>
         /// Value held by this Result.
-        /// Prefer using <see cref="Result{TValue,TError}.Unwrap"/>
+        /// Prefer using <see cref="Result.Unwrap{T, TE}"/>
         /// </summary>
         public T Value { get; set; } = Value;
 
@@ -67,7 +67,7 @@ public abstract record Result<T, TE>
     {
         /// <summary>
         /// Value held by this Result.
-        /// Prefer using <see cref="Result{TValue,TError}.UnwrapError"/>
+        /// Prefer using <see cref="Result.UnwrapError{TValue,TError}"/>
         /// </summary>
         public TE Value { get; set; } = Value;
 
@@ -122,6 +122,63 @@ public static class Result
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     public static Result<T, Exception> Error<T>(Exception exception) => new Result<T, Exception>.Error(exception);
+
+    /// <summary>
+    /// Creates a Result{T, TE} from a nullable value, returning an Ok result if the value is not null
+    /// or an Error result with the provided error if the value is null.
+    /// </summary>
+    /// <param name="value">The nullable value to be converted into a Result{T, TE}.</param>
+    /// <param name="error">The error to return in case the value is null.</param>
+    /// <returns>
+    /// A Result{T, TE} that represents either an Ok result with the given value
+    /// or an Error result with the provided error.
+    /// </returns>
+    [Pure]
+    public static Result<T, TE> FromNullable<T, TE>(T? value, TE error)
+    {
+        return value switch
+        {
+            not null => Ok<T, TE>(value),
+            _ => Error<T, TE>(error)
+        };
+    }
+
+    /// <summary>
+    /// Creates a <see cref="Result{T, TE}"/> instance from a nullable value.
+    /// If the value is not null, it returns an Ok result containing the value.
+    /// If the value is null, it returns an <see cref="Result{T,TE}.Error"/> containing a <see cref="NullReferenceException"/>
+    /// </summary>
+    /// <param name="value">The nullable value to check.</param>
+    /// <returns>
+    /// A <see cref="Result{T, TE}"/> representing an Ok result with the value or an Error result containing a <see cref="NullReferenceException"/>
+    /// </returns>
+    public static Result<T, Exception> FromNullable<T>(T? value)
+    {
+        return value switch
+        {
+            not null => Ok<T>(value),
+            _ => Error<T>(new NullReferenceException())
+        };
+    }
+    
+    /// <summary>
+    /// Converts a <see cref="Result{T, TE}"/> to a nullable value of type T if the result is successful (Ok).
+    /// Returns null if the result represents an error.
+    /// </summary>
+    /// <param name="result">The result instance to convert.</param>
+    /// <typeparam name="T">The type of the value contained in the result.</typeparam>
+    /// <typeparam name="TE">The type of the error contained in the result.</typeparam>
+    /// <returns>A nullable value of type T if the result is Ok, otherwise null.</returns>
+    [Pure]
+    public static T? ToNullable<T, TE>(this Result<T, TE> result)
+    {
+        return result switch
+        {
+            Result<T, TE>.Ok ok => (T?)ok.Value,
+            _ => default
+        };
+    }
+
 
     /// <summary>
     /// Checks whether the given result represents a successful operation.
@@ -234,11 +291,12 @@ public static class Result
     {
         return result switch
         {
-            Result<T, TE>.Ok ok => new Result<TR, TE>.Ok(action(ok.Value)),
-            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
+            Result<T, TE>.Ok ok => Ok<TR, TE>(action(ok.Value)),
+            Result<T, TE>.Error error => Error<TR, TE>(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+
 
     /// <summary>
     /// Applies a specified action to the value of a successful `Result`, returning the original result instance.
@@ -251,7 +309,7 @@ public static class Result
     /// <typeparam name="TE"></typeparam>
     /// <returns>The original `Result` instance, either with the same value or error.</returns>
     [Pure]
-    public static Result<T, TE> Map<T, TE>(this Result<T, TE> result, Action<T> action)
+    public static Result<T, TE> Tap<T, TE>(this Result<T, TE> result, Action<T> action)
     {
         if (result is Result<T, TE>.Ok ok) action(ok.Value);
 
@@ -274,8 +332,8 @@ public static class Result
     {
         return result switch
         {
-            Result<T, TE>.Ok ok => new Result<TR, TE>.Ok(await action(ok.Value)),
-            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
+            Result<T, TE>.Ok ok => Ok<TR, TE>(await action(ok.Value)),
+            Result<T, TE>.Error error => Error<TR, TE>(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -318,7 +376,7 @@ public static class Result
         return result switch
         {
             Result<T, TE>.Ok ok => apply(ok.Value),
-            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
+            Result<T, TE>.Error error => Error<TR, TE>(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -346,7 +404,7 @@ public static class Result
         return result switch
         {
             Result<T, TE>.Ok ok => await apply(ok.Value),
-            Result<T, TE>.Error error => new Result<TR, TE>.Error(error.Value),
+            Result<T, TE>.Error error => Error<TR, TE>(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -369,8 +427,8 @@ public static class Result
     {
         return result switch
         {
-            Result<T, TE>.Ok ok => new Result<T, TEr>.Ok(ok.Value),
-            Result<T, TE>.Error error => new Result<T, TEr>.Error(action(error.Value)),
+            Result<T, TE>.Ok ok => Ok<T, TEr>(ok.Value),
+            Result<T, TE>.Error error => Error<T, TEr>(action(error.Value)),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -385,7 +443,7 @@ public static class Result
     /// <param name="action"></param>
     /// <returns>The originial Result</returns>
     [Pure]
-    public static Result<T, TE> MapError<T, TE>(this Result<T, TE> result, Action<TE> action)
+    public static Result<T, TE> TapError<T, TE>(this Result<T, TE> result, Action<TE> action)
     {
         if (result is Result<T, TE>.Error error) action(error.Value);
 
@@ -403,8 +461,8 @@ public static class Result
     {
         return result switch
         {
-            Result<T, TE>.Ok ok => new Result<T, TEr>.Ok(ok.Value),
-            Result<T, TE>.Error => new Result<T, TEr>.Error(newError),
+            Result<T, TE>.Ok ok => Ok<T, TEr>(ok.Value),
+            Result<T, TE>.Error => Error<T, TEr>(newError),
             _ => throw new ArgumentOutOfRangeException(nameof(result), result, null)
         };
     }
@@ -441,7 +499,7 @@ public static class Result
         return result switch
         {
             Result<TValue, TError>.Ok ok => ok.Value,
-            Result<TValue, TError>.Error error => new Result<TValue, TError>.Error(error.Value),
+            Result<TValue, TError>.Error error => Error<TValue, TError>(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -483,15 +541,16 @@ public static class Result
             switch (result)
             {
                 case Result<TValue, TError>.Error error:
-                    return new Result<List<TValue>, TError>.Error(error.Value);
+                    return Error<List<TValue>, TError>(error.Value);
                 case Result<TValue, TError>.Ok ok:
                     list.Add(ok.Value);
                     break;
             }
         }
 
-        return new Result<List<TValue>, TError>.Ok(list);
+        return Ok<List<TValue>, TError>(list);
     }
+
 
     /// <summary>
     /// Given a list of results, returns a pair where the first element is a list of all the values inside 'Ok' and the second element is a list with all the values inside 'Error'.
