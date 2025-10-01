@@ -1,3 +1,8 @@
+v.7.1.0
+- Rename type arguments from "T", "TE", "Tr" and "TEr" to "OK", "ERROR", "OKAFTER" and "ERRORAFTER" respectively
+- Add .ConfigureAwait(false) to async await functions
+- Add variant of TryCatch that takes a Func<Exception, ERROR> used to convert the exception to a known error type
+
 v.7.0.0
 - Map(arg, Action<T>) renamed to Tap(arg, Action<T>)
 - MapError(arg, Action<T>) renamed to TapError(arg, Action<T>)
