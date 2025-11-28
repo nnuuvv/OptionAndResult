@@ -10,11 +10,11 @@
         <Description>Basic result type</Description>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <PackageProjectUrl>https://github.com/nnuuvv/OptionAndResult</PackageProjectUrl>
-        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/nnuuvv/OptionAndResult</RepositoryUrl>
         <PackageId>nuv.Result</PackageId>
         <Authors>nuv</Authors>
-        <Version>7.1.0</Version>
+        <Version>7.2.0</Version>
         <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 

@@ -321,6 +321,26 @@ public static class Result
     }
 
     /// <summary>
+    /// Replaces the value in the OK with a new value. <br></br>
+    /// Like calling <paramref name="result"/>.<see cref="Map{OK,ERROR,OKAFTER}"/>(_ => <paramref name="newValue"/>)<br></br>
+    /// But clearer in intent.
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="newValue"></param>
+    /// <typeparam name="OK"></typeparam>
+    /// <typeparam name="ERROR"></typeparam>
+    /// <typeparam name="OKAFTER"></typeparam>
+    /// <returns></returns>
+    [Pure]
+    public static Result<OKAFTER, ERROR> ReplaceValue<OK, ERROR, OKAFTER>(
+        this Result<OK, ERROR> result,
+        OKAFTER newValue
+    )
+    {
+        return result.Map(_ => newValue);
+    }
+
+    /// <summary>
     /// Updates a value held within the 'Ok' of a 'Result' by calling a given function on it.
     /// 
     /// If the 'Result' is an 'Error' rather than 'Ok', the function is not called and the 'Result' stays the same.

@@ -1,3 +1,7 @@
+v.7.2.0
+- Add ReplaceValue function
+- Change license to Apache-2.0
+
 v.7.1.0
 - Rename type arguments from "T", "TE", "Tr" and "TEr" to "OK", "ERROR", "OKAFTER" and "ERRORAFTER" respectively
 - Add .ConfigureAwait(false) to async await functions
