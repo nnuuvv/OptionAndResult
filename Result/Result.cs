@@ -364,6 +364,33 @@ public static class Result
     }
 
     /// <summary>
+    /// Updates a value held within the 'Ok' of a 'Result' by calling a given function on it.
+    /// 
+    /// If the 'Result' is an 'Error' rather than 'Ok', the function is not called and the 'Result' stays the same.
+    ///
+    /// This variant is useful for chaining <see cref="Task"/> returning functions
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="action"></param>
+    /// <typeparam name="OK">Type of the source value</typeparam>
+    /// <typeparam name="ERROR">Type of the Error</typeparam>
+    /// <typeparam name="OKAFTER">Type of the result value</typeparam>
+    /// <returns></returns>
+    [Pure]
+    public static async Task<Result<OKAFTER, ERROR>> MapAsync<OK, ERROR, OKAFTER>(this Task<Result<OK, ERROR>> result,
+        Func<OK, Task<OKAFTER>> action)
+    {
+        var res = await result.ConfigureAwait(false);
+        
+        return res switch
+        {
+            Result<OK, ERROR>.Ok ok => Ok<OKAFTER, ERROR>(await action(ok.Value).ConfigureAwait(false)),
+            Result<OK, ERROR>.Error error => Error<OKAFTER, ERROR>(error.Value),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    /// <summary>
     /// Extracts the value from a 'Result', returning a default value if there is none.
     /// </summary>
     /// <param name="result"></param>
@@ -416,6 +443,8 @@ public static class Result
     /// 
     /// This function is the equivalent of calling `map` followed by `flatten`, and
     /// it is useful for chaining together multiple functions that return `Result`.
+    ///
+    /// This variant is useful for calling <see cref="Task"/> returning functions
     /// </summary>
     /// <param name="result"></param>
     /// <param name="apply"></param>
@@ -433,6 +462,40 @@ public static class Result
             Result<OK, ERROR>.Error error => Error<OKAFTER, ERROR>(error.Value),
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    /// <summary>
+    /// Updates a value held within the `Ok` of a `Result` by calling a given function
+    /// on it, where the given function also returns a `Result`. The two results are
+    /// then merged together into one `Result`.
+    /// 
+    /// If the `Result` is an `Error` rather than `Ok` the function is not called and the original 'Error' is returned.
+    /// 
+    /// This function is the equivalent of calling `map` followed by `flatten`, and
+    /// it is useful for chaining together multiple functions that return `Result`.
+    ///
+    /// This variant is useful for chaining on tasks
+    /// </summary>
+    /// <param name="result"></param>
+    /// <param name="apply"></param>
+    /// <typeparam name="OK">Type of the source value</typeparam>
+    /// <typeparam name="ERROR">Type of the Error</typeparam>
+    /// <typeparam name="OKAFTER">Type of the result value</typeparam>
+    /// <returns></returns>
+    [Pure]
+    public static async Task<Result<OKAFTER, ERROR>> TryAsync<OK, ERROR, OKAFTER>(this Task<Result<OK, ERROR>> result,
+        Func<OK, Task<Result<OKAFTER, ERROR>>> apply)
+    {
+        var res = await result.ConfigureAwait(false);
+
+        return res switch
+
+            {
+                Result<OK, ERROR>.Ok ok => await apply(ok.Value).ConfigureAwait(false),
+                Result<OK, ERROR>.Error error => Error<OKAFTER, ERROR>(error.Value),
+                _ => throw new ArgumentOutOfRangeException()
+            }
+            ;
     }
 
     /// <summary>

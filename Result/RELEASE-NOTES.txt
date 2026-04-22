@@ -1,3 +1,6 @@
+v.7.3.0
+- Add MapAsync and TryAsync variants that take `Task<Result>`
+
 v.7.2.0
 - Add ReplaceValue function
 - Change license to Apache-2.0
